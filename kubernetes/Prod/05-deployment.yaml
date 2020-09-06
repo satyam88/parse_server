@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prod-parse_server
+    environment: prod
+    tier: backend
+  name: prod-parse_server
+  namespace: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prod-parse_server
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 20%
+      maxSurge: 100%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: prod-parse_server
+        environment: prod
+        tier: backend
+    spec:
+      containers:
+        - image: 719580743266.dkr.ecr.ap-south-1.amazonaws.com/parse_server:latest
+          name: parse_server
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/config
+              name: application-config
+      volumes:
+        - name: application-config
+          configMap:
+            name: application-config-parse_server
